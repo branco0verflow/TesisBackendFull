@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TareaServiceImpl {
@@ -64,6 +66,14 @@ public class TareaServiceImpl {
 
         return tareaRepository.save(tarea);
     }
+
+    public List<TareaDTO> getTareasByFecha(LocalDate fecha) {
+        List<Tarea> tareas = tareaRepository.findByFechaTareaOrderByHoraIngresoTarea(fecha);
+        return tareas.stream()
+                .map(TareaDTO::new)
+                .collect(Collectors.toList());
+    }
+
 
 
     public Optional<Tarea> updateTarea(Integer idTarea, TareaDTO dto) {
@@ -174,6 +184,9 @@ public class TareaServiceImpl {
                     .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
             tarea.setAdministrador(administrador);
         }
+        System.out.println("Existe admin? " + administradorRepository.existsById(dto.getIdAdmin()));
+        System.out.println("Existe estado? " + estadoRepository.existsById(dto.getIdEstado()));
+        System.out.println("Existe mecanico? " + mecanicoRepository.existsById(dto.getIdMecanico()));
 
 
     }

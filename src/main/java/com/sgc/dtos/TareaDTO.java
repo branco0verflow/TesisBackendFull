@@ -1,5 +1,6 @@
 package com.sgc.dtos;
 
+import com.sgc.domains.Tarea;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -33,13 +34,39 @@ public class TareaDTO {
 
     @NotNull(message = "El ID del mecánico es obligatorio")
     private Integer idMecanico;
+    private String nombreMecanico;
 
     @NotNull(message = "El ID del estado es obligatorio")
     private Integer idEstado;
+    private String nombreEstado;
 
     @NotNull(message = "El ID del administrador es obligatorio")
     private Integer idAdmin;
+    private String nombreAdmin;
 
+public TareaDTO(){
+
+}
+
+    public TareaDTO(Tarea tarea) {
+        this.idTarea = tarea.getIdTarea();
+        this.fechaTarea = tarea.getFechaTarea();
+        this.horaIngresoTarea = tarea.getHoraIngresoTarea();
+        this.horaFinTarea = tarea.getHoraFinTarea();
+        this.descripcionTarea = tarea.getDescripcionTarea();
+
+        this.esReservaTarea = tarea.getEsReservaTarea();
+        this.idReserva = tarea.getReserva() != null ? tarea.getReserva().getIdReserva() : null;
+
+        this.idMecanico = tarea.getMecanico().getIdMecanico();
+        this.nombreMecanico = tarea.getMecanico().getNombreMecanico();
+
+        this.idEstado = tarea.getEstado().getIdEstado();
+        this.nombreEstado = tarea.getEstado().getNombreEstado();
+
+        this.idAdmin = tarea.getAdministrador().getIdAdmin();
+        this.nombreAdmin = tarea.getAdministrador().getNombreAdmin();
+    }
 
 
     // Getters y Setters
@@ -132,5 +159,27 @@ public class TareaDTO {
         this.idAdmin = idAdmin;
     }
 
+    public String getNombreMecanico() {
+        return nombreMecanico;
+    }
 
+    public void setNombreMecanico(String nombreMecanico) {
+        this.nombreMecanico = nombreMecanico;
+    }
+
+    public String getNombreEstado() {
+        return nombreEstado;
+    }
+
+    public void setNombreEstado(String nombreEstado) {
+        this.nombreEstado = nombreEstado;
+    }
+
+    public String getNombreAdmin() {
+        return nombreAdmin;
+    }
+
+    public void setNombreAdmin(String nombreAdmin) {
+        this.nombreAdmin = nombreAdmin;
+    }
 }
