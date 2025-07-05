@@ -17,7 +17,7 @@ import java.util.List;
         }
 
         public Integer getId() {
-            return admin.getIdAdmin(); // <-- lo que necesitás
+            return admin.getIdAdmin();
         }
 
         @Override
