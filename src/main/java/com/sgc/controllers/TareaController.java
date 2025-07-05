@@ -6,6 +6,7 @@ import com.sgc.services.TareaServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -64,7 +65,7 @@ public class TareaController {
     }*/
 
 
-    @PutMapping("/{idTarea}")
+    @PutMapping("/{idTarea}") // No parece necesario actualizar T-ODO el objeto, ya que sobre escribiría datos que no se alteren
     public ResponseEntity<?> putTarea(@PathVariable Integer idTarea, @Valid @RequestBody TareaDTO tareaDTO) {
         return tareaService.updateTarea(idTarea, tareaDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -76,9 +77,17 @@ public class TareaController {
 
     @DeleteMapping("/{idTarea}")
     public ResponseEntity<?> deleteTarea(@PathVariable int idTarea) {
-        boolean isDeleted = tareaService.deleteTarea(idTarea);
-        return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        try {
+            boolean eliminado = tareaService.eliminarTareaSegura(idTarea);
+            return eliminado
+                    ? ResponseEntity.noContent().build()
+                    : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar la tarea: " + e.getMessage());
+        }
     }
+
 
 /*
     @GetMapping("/diasdisponibles")

@@ -3,6 +3,7 @@ package com.sgc.services;
 import com.sgc.domains.*;
 import com.sgc.dtos.TareaDTO;
 import com.sgc.repositories.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -135,6 +136,26 @@ public class TareaServiceImpl {
     }
 
 
+    @Transactional
+    public boolean eliminarTareaSegura(int idTarea) {
+        Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
+        if (optionalTarea.isEmpty()) return false;
+
+        Tarea tarea = optionalTarea.get();
+
+        // Desvincular relaciones
+        tarea.setReserva(null);
+        tarea.setMecanico(null);
+        tarea.setEstado(null);
+        tarea.setAdministrador(null);
+
+        // Eliminar luego de desvincular
+        tareaRepository.delete(tarea);
+        return true;
+    }
+
+
+    // No se usa este metodo, ver borrar BB
     public boolean deleteTarea(Integer idTarea) {
         if (!tareaRepository.existsById(idTarea)) {
             return false;

@@ -1,4 +1,4 @@
-package com.sgc.services;
+package com.sgc.security;
 
 import com.sgc.domains.Administrador;
 import org.springframework.security.core.GrantedAuthority;

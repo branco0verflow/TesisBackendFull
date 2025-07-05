@@ -28,6 +28,7 @@ public class TimeRange {
 
     }
 
+
     public TimeRange(LocalTime inicio, LocalTime fin) {
         this.inicio = inicio;
         this.fin = fin;

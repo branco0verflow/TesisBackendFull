@@ -4,6 +4,7 @@ import com.sgc.domains.Administrador;
 import com.sgc.repositories.AdministradorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +17,8 @@ public class AdministradorServiceImpl {
     private AdministradorRepository administradorRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
+
 
     public List<Administrador> getAdministrador() {
         return administradorRepository.findAll();
