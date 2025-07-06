@@ -1,5 +1,6 @@
 package com.sgc.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,16 +19,19 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final AdministradorDetailsService administradorDetailsService;
+    private final MecanicoDetailsService mecanicoDetailsService;
 
-    public SecurityConfig(AdministradorDetailsService administradorDetailsService) {
+    public SecurityConfig(AdministradorDetailsService administradorDetailsService,
+                          MecanicoDetailsService mecanicoDetailsService) {
         this.administradorDetailsService = administradorDetailsService;
+        this.mecanicoDetailsService = mecanicoDetailsService;
     }
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000"); // origen de tu frontend
+        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
@@ -36,12 +40,22 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
+
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(administradorDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public DaoAuthenticationProvider adminAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(administradorDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    
+    @Bean
+    public DaoAuthenticationProvider mecanicoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(mecanicoDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
 
@@ -52,19 +66,33 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/mecanico/**").hasRole("MECANICO")
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
-                        .loginProcessingUrl("/login")
+                        // Podés usar un solo login si querés, pero lo separamos aquí
+                        .loginProcessingUrl("/login-admin")
+                        .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
+                        .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
                         .permitAll()
+                )
+                .formLogin(form -> form
+                        .loginProcessingUrl("/login-mecanico")
+                        .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
+                        .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                .authenticationProvider(daoAuthenticationProvider())
+                .authenticationProvider(adminAuthenticationProvider())
+                .authenticationProvider(mecanicoAuthenticationProvider())
                 .build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -76,3 +104,4 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+
