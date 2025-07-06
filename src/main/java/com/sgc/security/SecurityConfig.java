@@ -41,11 +41,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {}) //  Habilita el CorsFilter arriba
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 👈 ya incluye el context-path automáticamente
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
-                        .loginProcessingUrl("/api/login")
+                        .loginProcessingUrl("/login") // 👈 sin el /api
                         .permitAll()
                 )
                 .build();

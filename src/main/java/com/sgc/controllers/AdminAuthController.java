@@ -14,13 +14,14 @@ public class AdminAuthController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getAdminInfo(Authentication auth) {
-        if (auth == null || !(auth.getPrincipal() instanceof AdministradorUserDetails)) {
+        if (auth == null || !(auth.getPrincipal() instanceof AdministradorUserDetails userDetails)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "No autenticado"));
         }
 
-        AdministradorUserDetails userDetails = (AdministradorUserDetails) auth.getPrincipal();
-        return ResponseEntity.ok(Map.of("idAdmin", userDetails.getId())); // 👈 esto devuelve JSON
+        return ResponseEntity.ok(Map.of("idAdmin", userDetails.getId()));
     }
-
 }
+
+
+
 
