@@ -18,6 +18,9 @@ public class AdministradorDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Administrador admin = administradorRepository.findByEmailAdmin(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Administrador no encontrado"));
+        System.out.println("Intentando autenticar a: " + email);
+
         return new AdministradorUserDetails(admin);
+
     }
 }
