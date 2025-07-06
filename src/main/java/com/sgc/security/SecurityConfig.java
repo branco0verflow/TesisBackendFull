@@ -49,7 +49,7 @@ public class SecurityConfig {
         return provider;
     }
 
-    
+
     @Bean
     public DaoAuthenticationProvider mecanicoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/mecanico/**").hasRole("MECANICO")
+                        .requestMatchers("/sgc/api/v1/mecanico").permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

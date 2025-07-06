@@ -20,6 +20,14 @@ public class MecanicoUserDetails implements UserDetails {
         return mecanico.getIdMecanico();
     }
 
+    public String getNombre(){
+        return mecanico.getNombreMecanico();
+    }
+
+    public String getApellido(){
+        return mecanico.getApellidoMecanico();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_MECANICO"));
@@ -29,6 +37,10 @@ public class MecanicoUserDetails implements UserDetails {
     public String getPassword() {
         return mecanico.getPasswordMecanico();
     }
+
+
+
+
 
     @Override
     public String getUsername() {
