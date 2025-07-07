@@ -66,12 +66,18 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/mecanico/**").hasRole("MECANICO")
                         .requestMatchers("/sgc/api/v1/mecanico/**").permitAll()
                         .anyRequest().permitAll()
                 )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"No autorizado\"}");
+                        })
+                )
                 .formLogin(form -> form
-                        .loginProcessingUrl("/login") // común para ambos
+                        .loginProcessingUrl("/login")
                         .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
                         .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
                         .permitAll()
@@ -87,6 +93,7 @@ public class SecurityConfig {
                 .authenticationProvider(mecanicoAuthenticationProvider())
                 .build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
