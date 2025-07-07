@@ -66,18 +66,12 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/sgc/api/v1/mecanico").permitAll()
+                        .requestMatchers("/mecanico/**").hasRole("MECANICO")
+                        .requestMatchers("/sgc/api/v1/mecanico/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
-                        // Podés usar un solo login si querés, pero lo separamos aquí
-                        .loginProcessingUrl("/login-admin")
-                        .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
-                        .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
-                        .permitAll()
-                )
-                .formLogin(form -> form
-                        .loginProcessingUrl("/login-mecanico")
+                        .loginProcessingUrl("/login") // común para ambos
                         .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
                         .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
                         .permitAll()
