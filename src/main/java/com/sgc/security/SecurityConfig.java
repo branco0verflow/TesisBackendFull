@@ -67,6 +67,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/sgc/api/v1/mecanico/**").permitAll()
+                        .requestMatchers("/sgc/api/v1/seguimiento", "/sgc/api/v1/seguimiento/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling(ex -> ex

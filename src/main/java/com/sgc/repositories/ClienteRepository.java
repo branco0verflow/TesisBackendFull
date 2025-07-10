@@ -13,5 +13,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
     Optional<Cliente> findByEmailCliente(String emailCliente); // necesito verificar porque el Email es único y debo evitar duplicados. BB
 
+    Optional<Cliente> findByDocumentoClienteAndEmailCliente(String documentoCliente, String emailCliente); // Necesito esto para Seguimientos.
 
 }
