@@ -1,9 +1,8 @@
 package com.sgc.services;
 
-import com.sgc.domains.Cliente;
 import com.sgc.domains.Reserva;
-import com.sgc.domains.Vehiculo;
 import com.sgc.dtos.SeguimientoReservaDTO;
+import com.sgc.exceptions.RecursoNoEncontradoException;
 import com.sgc.repositories.ReservaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -25,14 +24,13 @@ public class SeguimientoService {
         List<Reserva> reservas = reservaRepository.findSeguimiento(documento, email);
 
         if (reservas.isEmpty()) {
-            throw new RuntimeException("Cliente no encontrado o sin reservas");
+            throw new RecursoNoEncontradoException("Cliente no encontrado o sin reservas");
         }
 
         return reservas.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-
 
     private SeguimientoReservaDTO toDto(Reserva r) {
         var c = r.getCliente();
@@ -52,5 +50,6 @@ public class SeguimientoService {
         );
     }
 }
+
 
 
