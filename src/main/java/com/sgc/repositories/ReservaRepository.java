@@ -20,7 +20,7 @@ public interface ReservaRepository extends JpaRepository<Reserva,Integer> {
               JOIN  FETCH v.modelo mo
               JOIN  FETCH mo.marca
        WHERE  r.cliente.documentoCliente = :doc
-         AND  LOWER(r.cliente.emailCliente) = LOWER(:email)
+         AND  LOWER(TRIM(r.cliente.emailCliente)) = LOWER(TRIM(:email))
        """)
     List<Reserva> findSeguimiento(@Param("doc") String doc,
                                   @Param("email") String email);
