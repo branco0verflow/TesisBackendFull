@@ -104,7 +104,7 @@ public class ReservaServiceImpl {
         Mecanico mecanico = mecanicoRepository.findById(dto.getIdMecanico()).orElseThrow(() -> new RuntimeException("Mecánico no encontrado"));
         reserva.setMecanico(mecanico);
 
-        tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, sino queda el espacio disponible en la interfaz de admin. BB
+        tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, si no queda el espacio disponible en la interfaz de admin. BB
 
         return reservaRepository.save(reserva);
     }
@@ -133,6 +133,8 @@ public class ReservaServiceImpl {
         reserva.setMecanico(mecanico);
         reserva.setEstado(estado);
         reserva.setTipoTarea(tareas);
+
+        tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, si no queda el espacio disponible en la interfaz de admin. BB
 
         return reservaRepository.save(reserva);
     }
