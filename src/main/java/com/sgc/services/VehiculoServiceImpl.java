@@ -48,6 +48,14 @@ public class VehiculoServiceImpl {
                 });
     }
 
+    public Optional<Vehiculo> patchKilometraje(Integer idVehiculo, Integer nuevoKilometraje) {
+        return vehiculoRepository.findById(idVehiculo).map(vehiculo -> {
+            vehiculo.setKilometrajeVehiculo(nuevoKilometraje);
+            return vehiculoRepository.save(vehiculo);
+        });
+    }
+
+
     public Optional<Vehiculo> patchVehiculo(Integer idVehiculo, Vehiculo vehiculo) {
         return vehiculoRepository.findById(idVehiculo)
                 .map(existente -> {

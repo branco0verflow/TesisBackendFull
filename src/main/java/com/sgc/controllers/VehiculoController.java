@@ -1,6 +1,7 @@
 package com.sgc.controllers;
 
 import com.sgc.domains.Vehiculo;
+import com.sgc.dtos.VehiculoPatchDTO;
 import com.sgc.services.VehiculoServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,15 @@ public class VehiculoController {
     public ResponseEntity<?> patchVehiculo(@PathVariable Integer idVehiculo, @Valid @RequestBody Vehiculo vehiculo) {
         return vehiculoService.patchVehiculo(idVehiculo, vehiculo).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PatchMapping("/nuevoKilometraje/{idVehiculo}")
+    public ResponseEntity<?> patchVehiculo(@PathVariable Integer idVehiculo,
+                                           @RequestBody VehiculoPatchDTO dto) {
+        return vehiculoService.patchKilometraje(idVehiculo, dto.getKilometrajeVehiculo())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
     @DeleteMapping("/{idVehiculo}")
     public ResponseEntity<?> deleteVehiculo(@PathVariable int idVehiculo) {
