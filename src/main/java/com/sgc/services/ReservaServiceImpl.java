@@ -134,11 +134,20 @@ public class ReservaServiceImpl {
         reserva.setEstado(estado);
         reserva.setTipoTarea(tareas);
 
-        tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, si no queda el espacio disponible en la interfaz de admin. BB
+        // PRIMERO GUARDAR LA RESERVA
+        Reserva reservaGuardada = reservaRepository.save(reserva);
 
-        return reservaRepository.save(reserva);
+        // AHORA crear la tarea asociada con reserva ya persistida
+        tareaService.createTareaFromReserva(reservaGuardada);
+
+        return reservaGuardada;
     }
 
+
+
+    public List<Reserva> obtenerReservasPorVehiculo(Integer idVehiculo) {
+        return reservaRepository.findByVehiculoIdVehiculo(idVehiculo);
+    }
 
 
 

@@ -67,6 +67,12 @@ public class ReservaController {
         }
     }
 
+    @GetMapping("/vehiculo/{idVehiculo}")
+    public ResponseEntity<List<Reserva>> getReservasPorVehiculo(@PathVariable Integer idVehiculo) {
+        List<Reserva> reservas = reservaService.obtenerReservasPorVehiculo(idVehiculo);
+        return ResponseEntity.ok(reservas);
+    }
+
 
 
     @PutMapping("/{idReserva}")

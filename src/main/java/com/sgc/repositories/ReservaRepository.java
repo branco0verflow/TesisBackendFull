@@ -22,8 +22,13 @@ public interface ReservaRepository extends JpaRepository<Reserva,Integer> {
        WHERE  r.cliente.documentoCliente = :doc
          AND  LOWER(TRIM(r.cliente.emailCliente)) = LOWER(TRIM(:email))
        """)
-    List<Reserva> findSeguimiento(@Param("doc") String doc,
-                                  @Param("email") String email);
+    List<Reserva> findSeguimiento(@Param("doc") String doc, @Param("email") String email);
+
+
+
+    List<Reserva> findByVehiculoIdVehiculo(Integer idVehiculo);
+
+
 
 }
 
