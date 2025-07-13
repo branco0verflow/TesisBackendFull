@@ -33,7 +33,6 @@ public class TareaServiceImpl {
     private AdministradorRepository administradorRepository;
 
 
-
     public List<Tarea> getTareas() {
         return tareaRepository.findAll();
     }
@@ -74,7 +73,6 @@ public class TareaServiceImpl {
                 .map(TareaDTO::new)
                 .collect(Collectors.toList());
     }
-
 
 
     public Optional<Tarea> updateTarea(Integer idTarea, TareaDTO dto) {
@@ -128,7 +126,6 @@ public class TareaServiceImpl {
                         .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
                 tarea.setAdministrador(administrador);
             }
-
 
 
             return tareaRepository.save(tarea);
@@ -212,17 +209,4 @@ public class TareaServiceImpl {
 
     }
 
-    /*
-    // Consulta para obtener los días disponibles (con 2 días de anticipación)
-    public List<Object[]> getDiasDisponibles() {
-        LocalDate fechaMinima = LocalDate.now().plusDays(2);
-        Date fechaSQL = Date.valueOf(fechaMinima);
-        return tareaRepository.findDiasConCantidadDeTareas(fechaSQL);
-    }
-
-    // Consulta para obtener las tareas de un día específico ordenadas por hora
-    public List<Tarea> getHorariosOcupadosPorDia(LocalDate fecha) {
-        Date fechaSQL = Date.valueOf(fecha);
-        return tareaRepository.findTareasByFechaOrderByHora(fechaSQL);
-    }*/
 }

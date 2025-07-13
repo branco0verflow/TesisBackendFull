@@ -4,6 +4,9 @@ import java.sql.Time;
 import java.util.Date;
 
 public class SeguimientoReservaDTO {
+
+    private Integer idCliente;
+    private Integer idVehiculo;
     private String nombreCliente;
     private String apellidoCliente;
     private String modeloVehiculo;
@@ -15,9 +18,22 @@ public class SeguimientoReservaDTO {
     private String estado;
     private String descripcion;
 
-
-
-    public SeguimientoReservaDTO(String nombreCliente, String apellidoCliente, String modeloVehiculo, String marcaVehiculo, String matricula, Date fechaCita, Time horaInicio, Time horaFin, String estado, String descripcion) {
+    public SeguimientoReservaDTO(
+            Integer idCliente,
+            Integer idVehiculo,
+            String nombreCliente,
+            String apellidoCliente,
+            String modeloVehiculo,
+            String marcaVehiculo,
+            String matricula,
+            Date fechaCita,
+            Time horaInicio,
+            Time horaFin,
+            String estado,
+            String descripcion
+    ) {
+        this.idCliente = idCliente;
+        this.idVehiculo = idVehiculo;
         this.nombreCliente = nombreCliente;
         this.apellidoCliente = apellidoCliente;
         this.modeloVehiculo = modeloVehiculo;
@@ -28,6 +44,24 @@ public class SeguimientoReservaDTO {
         this.horaFin = horaFin;
         this.estado = estado;
         this.descripcion = descripcion;
+    }
+
+    // Getters y setters
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public Integer getIdVehiculo() {
+        return idVehiculo;
+    }
+
+    public void setIdVehiculo(Integer idVehiculo) {
+        this.idVehiculo = idVehiculo;
     }
 
     public String getNombreCliente() {
@@ -110,3 +144,4 @@ public class SeguimientoReservaDTO {
         this.descripcion = descripcion;
     }
 }
+

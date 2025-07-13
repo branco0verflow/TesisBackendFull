@@ -37,6 +37,8 @@ public class SeguimientoService {
         var v = r.getVehiculo();
 
         return new SeguimientoReservaDTO(
+                c.getIdCliente(),
+                v.getIdVehiculo(),
                 c.getNombreCliente(),
                 c.getApellidoCliente(),
                 v.getModelo().getNombreModelo(),
@@ -49,6 +51,7 @@ public class SeguimientoService {
                 r.getComentariosReserva()
         );
     }
+
 }
 
 

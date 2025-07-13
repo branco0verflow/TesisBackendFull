@@ -52,6 +52,14 @@ public class ClienteServiceImpl {
                 });
     }
 
+    public Optional<Cliente> patchTelefono(Integer idCliente, String nuevoTelefono) {
+        return clienteRepository.findById(idCliente).map(cliente -> {
+            cliente.setTelefonoCliente(nuevoTelefono);
+            return clienteRepository.save(cliente);
+        });
+    }
+
+
     public boolean deleteCliente(Integer idCliente) {
         if (!clienteRepository.existsById(idCliente)) {
             return false;

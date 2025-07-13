@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,20 +51,12 @@ public class TareaController {
                 .toUri();
         return ResponseEntity
                 .created(location)
-                .body(new TareaDTO(nuevaTarea)); // ✅ Devuelve el objeto creado
+                .body(new TareaDTO(nuevaTarea)); // Devuelve el objeto creado
     }
 
 
-    /*@PostMapping("/fecha/{fecha}") // No está funcionando, ver BB
-    public ResponseEntity<?> crearTareaConFecha(@PathVariable LocalDate fecha, @RequestBody TareaDTO dto) {
-        dto.setFechaTarea(fecha);
-        Tarea nuevaTarea = tareaService.createTarea(dto);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{idTarea}").buildAndExpand(nuevaTarea.getIdTarea()).toUri();
-        return ResponseEntity.created(location).build();
-    }*/
 
-
-    @PutMapping("/{idTarea}") // No parece necesario actualizar T-ODO el objeto, ya que sobre escribiría datos que no se alteren
+    @PutMapping("/{idTarea}") // No parece necesario actualizar T-ODO el objeto, ya que datos que no se alteren
     public ResponseEntity<?> putTarea(@PathVariable Integer idTarea, @Valid @RequestBody TareaDTO tareaDTO) {
         return tareaService.updateTarea(idTarea, tareaDTO).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -89,19 +80,4 @@ public class TareaController {
     }
 
 
-/*
-    @GetMapping("/diasdisponibles")
-    public ResponseEntity<?> getDiasDisponibles() {
-        List<Object[]> dias = tareaService.getDiasDisponibles();
-        return ResponseEntity.ok(dias);
-    }
-
-
-    @GetMapping("/horarios")
-    public ResponseEntity<?> getHorariosOcupadosPorDia(@RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-        List<Tarea> tareas = tareaService.getHorariosOcupadosPorDia(fecha);
-        return ResponseEntity.ok(tareas);
-    }
-
-    */
 }

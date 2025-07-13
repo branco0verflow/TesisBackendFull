@@ -1,6 +1,7 @@
 package com.sgc.controllers;
 
 import com.sgc.domains.Cliente;
+import com.sgc.dtos.ClientePatchDTO;
 import com.sgc.services.ClienteServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,15 @@ public class ClienteController {
     @PatchMapping("/{idCliente}")
     public ResponseEntity<?> patchCliente(@PathVariable Integer idCliente, @Valid @RequestBody Cliente cliente) {
         return clienteService.patchCliente(idCliente, cliente)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Este patch solo permite modificar el número de teléfono (útil en CrearReservaSeguimiento.js);
+    @PatchMapping("/nuevoPhone/{idCliente}")
+    public ResponseEntity<?> patchCliente(@PathVariable Integer idCliente,
+                                          @RequestBody ClientePatchDTO dto) {
+        return clienteService.patchTelefono(idCliente, dto.getTelefonoCliente())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
