@@ -3,12 +3,14 @@ package com.sgc.services;
 import com.sgc.domains.*;
 import com.sgc.dtos.ClienteDTO;
 import com.sgc.dtos.ReservaDTO;
+import com.sgc.dtos.ReservaNuevaDTO;
 import com.sgc.dtos.VehiculoDTO;
 import com.sgc.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -106,6 +108,36 @@ public class ReservaServiceImpl {
 
         return reservaRepository.save(reserva);
     }
+
+    // Esto resuelve poder crear Reservas desde CrearReservaSeguimiento.js (para reservas con Clientes y vehículos ya rehistrados)
+    public Reserva createReservaDesdeIds(ReservaNuevaDTO dto) {
+        Cliente cliente = clienteRepository.findById(dto.getIdCliente())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Vehiculo vehiculo = vehiculoRepository.findById(dto.getIdVehiculo())
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado"));
+        Mecanico mecanico = mecanicoRepository.findById(dto.getIdMecanico())
+                .orElseThrow(() -> new RuntimeException("Mecánico no encontrado"));
+        Estado estado = estadoRepository.findById(dto.getIdEstado())
+                .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
+
+        List<TipoTarea> tareas = tipoTareaRepository.findAllById(dto.getIdsTipoTarea());
+
+        Reserva reserva = new Reserva();
+        reserva.setFechaCreadaReserva(Date.valueOf(LocalDate.now()));
+        reserva.setFechaCitaReserva(dto.getFechaCitaReserva());
+        reserva.setHoraInicioReserva(dto.getHoraInicioReserva());
+        reserva.setHoraFinReserva(dto.getHoraFinReserva());
+        reserva.setComentariosReserva(dto.getComentariosReserva());
+        reserva.setCliente(cliente);
+        reserva.setVehiculo(vehiculo);
+        reserva.setMecanico(mecanico);
+        reserva.setEstado(estado);
+        reserva.setTipoTarea(tareas);
+
+        return reservaRepository.save(reserva);
+    }
+
+
 
 
 

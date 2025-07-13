@@ -2,6 +2,7 @@ package com.sgc.controllers;
 
 import com.sgc.domains.Reserva;
 import com.sgc.dtos.ReservaDTO;
+import com.sgc.dtos.ReservaNuevaDTO;
 import com.sgc.services.ReservaServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,22 @@ public class ReservaController {
                     .body("Error interno: " + e.getMessage());
         }
     }
+
+    // Endpoint para Reservas desde Seguimientos.js (Clientes y vehículos ya existentes)
+    @PostMapping("/nuevaReservaSeguimiento")
+    public ResponseEntity<?> postReservaSimple(@Valid @RequestBody ReservaNuevaDTO dto) {
+        try {
+            Reserva reserva = reservaService.createReservaDesdeIds(dto);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(reserva.getIdReserva())
+                    .toUri();
+            return ResponseEntity.created(location).body(reserva);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error al crear la reserva: " + e.getMessage());
+        }
+    }
+
 
 
     @PutMapping("/{idReserva}")
