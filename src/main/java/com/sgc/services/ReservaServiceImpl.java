@@ -8,7 +8,9 @@ import com.sgc.dtos.VehiculoDTO;
 import com.sgc.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -114,6 +116,14 @@ public class ReservaServiceImpl {
 
     // Esto resuelve poder crear Reservas desde CrearReservaSeguimiento.js (para reservas con Clientes y vehículos ya rehistrados)
     public Reserva createReservaDesdeIds(ReservaNuevaDTO dto) {
+
+        boolean yaTieneReservaFutura = reservaRepository
+                .existsByVehiculo_IdVehiculoAndFechaCitaReservaAfter(dto.getIdVehiculo(), LocalDate.now());
+
+        if (yaTieneReservaFutura) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este vehículo ya tiene una reserva pendiente.");
+        }
+
         Cliente cliente = clienteRepository.findById(dto.getIdCliente())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
         Vehiculo vehiculo = vehiculoRepository.findById(dto.getIdVehiculo())
@@ -152,7 +162,7 @@ public class ReservaServiceImpl {
         if (optionalReserva.isEmpty()) return false;
 
         Reserva reserva = optionalReserva.get();
-        
+
 
         // Así desvinculo las relaciones en la tabla reserva_tipo_tarea (importante)
         if (reserva.getTipoTarea() != null) {
