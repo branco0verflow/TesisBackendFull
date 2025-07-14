@@ -39,6 +39,9 @@ public class ReservaServiceImpl {
     @Autowired
     private TareaServiceImpl tareaService;
 
+    @Autowired
+    private TareaRepository tareaRepository;
+
 
     public List<Reserva> getReserva() {
         return reservaRepository.findAll();
@@ -134,14 +137,42 @@ public class ReservaServiceImpl {
         reserva.setEstado(estado);
         reserva.setTipoTarea(tareas);
 
-        // PRIMERO GUARDAR LA RESERVA
+        // primero guardar la reserva
         Reserva reservaGuardada = reservaRepository.save(reserva);
 
-        // AHORA crear la tarea asociada con reserva ya persistida
+        // Después crear la tarea asociada con reserva ya persistida
         tareaService.createTareaFromReserva(reservaGuardada);
 
         return reservaGuardada;
     }
+
+    @Transactional
+    public boolean eliminarReservaYTarea(Integer idReserva) {
+        Optional<Reserva> optionalReserva = reservaRepository.findById(idReserva);
+        if (optionalReserva.isEmpty()) return false;
+
+        Reserva reserva = optionalReserva.get();
+
+        // Tengo que desvincular relaciones ManyToOne
+        reserva.setMecanico(null);
+        reserva.setCliente(null);
+        reserva.setVehiculo(null);
+        reserva.setEstado(null);
+
+        // Así desvinculo las relaciones en la tabla reserva_tipo_tarea (importante)
+        if (reserva.getTipoTarea() != null) {
+            reserva.getTipoTarea().clear();
+        }
+
+        // buscar y eliminar la tarea asociada
+        Optional<Tarea> tareaOptional = tareaRepository.findByReservaIdReserva(idReserva);
+        tareaOptional.ifPresent(tarea -> tareaService.eliminarTareaSegura(tarea.getIdTarea()));
+
+        // eliminar la reserva
+        reservaRepository.delete(reserva);
+        return true;
+    }
+
 
 
 

@@ -133,6 +133,7 @@ public class TareaServiceImpl {
     }
 
 
+
     @Transactional
     public boolean eliminarTareaSegura(int idTarea) {
         Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
@@ -145,6 +146,7 @@ public class TareaServiceImpl {
         tarea.setMecanico(null);
         tarea.setEstado(null);
         tarea.setAdministrador(null);
+
 
         // Eliminar luego de desvincular
         tareaRepository.delete(tarea);

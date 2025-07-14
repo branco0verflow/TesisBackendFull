@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Integer> {
@@ -19,22 +20,7 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
 
     List<Tarea> findByFechaTareaOrderByHoraIngresoTarea(LocalDate fecha);
 
-    /*
+    Optional<Tarea> findByReservaIdReserva(Integer idReserva);
 
-     Consulta los días con cantidad de tareas, recibiendo la fecha mínima como parámetro
-    @Query("SELECT t.fechaTarea, COUNT(t) " +
-            "FROM Tarea t " +
-            "WHERE t.fechaTarea >= :fechaMinima " +
-            "GROUP BY t.fechaTarea " +
-            "ORDER BY t.fechaTarea ASC")
-    List<Object[]> findDiasConCantidadDeTareas(Date fechaMinima);
-
-    // Consulta las tareas de un día específico ordenadas por hora
-    @Query("SELECT t FROM Tarea t " +
-            "WHERE t.fechaTarea = :fecha " +
-            "ORDER BY t.horaIngresoTarea ASC")
-    List<Tarea> findTareasByFechaOrderByHora(Date fecha);
-
-    */
 
 }
