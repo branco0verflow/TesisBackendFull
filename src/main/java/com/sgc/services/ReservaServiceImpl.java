@@ -152,12 +152,7 @@ public class ReservaServiceImpl {
         if (optionalReserva.isEmpty()) return false;
 
         Reserva reserva = optionalReserva.get();
-
-        // Tengo que desvincular relaciones ManyToOne
-        reserva.setMecanico(null);
-        reserva.setCliente(null);
-        reserva.setVehiculo(null);
-        reserva.setEstado(null);
+        
 
         // Así desvinculo las relaciones en la tabla reserva_tipo_tarea (importante)
         if (reserva.getTipoTarea() != null) {
