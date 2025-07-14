@@ -73,6 +73,18 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
+    // De esta forma se cancelan 'Eliminan' las Reservas y también la Tarea definitivamente.
+    @DeleteMapping("/{idReserva}/cancelar")
+    public ResponseEntity<String> cancelarReserva(@PathVariable Integer idReserva) {
+        boolean eliminada = reservaService.eliminarReservaYTarea(idReserva);
+        if (eliminada) {
+            return ResponseEntity.ok("Reserva y tarea eliminadas correctamente.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la reserva.");
+        }
+    }
+
+
 
 
     @PutMapping("/{idReserva}")
