@@ -6,6 +6,8 @@ import com.sgc.exceptions.RecursoNoEncontradoException;
 import com.sgc.repositories.ReservaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,10 @@ public class SeguimientoService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+
+
+
 
     private SeguimientoReservaDTO toDto(Reserva r) {
         var c = r.getCliente();

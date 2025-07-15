@@ -73,6 +73,12 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
+    @GetMapping("/verificarReservaActiva")
+    public ResponseEntity<Boolean> verificarReservaActivaOFutura(@RequestParam Integer idVehiculo) {
+        boolean tieneReserva = reservaService.tieneReservaActivaOFutura(idVehiculo);
+        return ResponseEntity.ok(tieneReserva);
+    }
+
     // De esta forma se cancelan 'Eliminan' las Reservas y también la Tarea definitivamente.
     @DeleteMapping("/{idReserva}/cancelar")
     public ResponseEntity<String> cancelarReserva(@PathVariable Integer idReserva) {

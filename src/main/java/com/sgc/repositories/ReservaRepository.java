@@ -32,7 +32,8 @@ public interface ReservaRepository extends JpaRepository<Reserva,Integer> {
 
 
 
-    boolean existsByVehiculo_IdVehiculoAndFechaCitaReservaAfter(Integer idVehiculo, LocalDate fecha);
+    boolean existsByVehiculo_IdVehiculoAndFechaCitaReservaGreaterThanEqual(Integer idVehiculo, LocalDate fecha);
+
 
 
 }

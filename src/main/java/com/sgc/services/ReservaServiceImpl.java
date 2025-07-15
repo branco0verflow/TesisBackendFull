@@ -118,7 +118,8 @@ public class ReservaServiceImpl {
     public Reserva createReservaDesdeIds(ReservaNuevaDTO dto) {
 
         boolean yaTieneReservaFutura = reservaRepository
-                .existsByVehiculo_IdVehiculoAndFechaCitaReservaAfter(dto.getIdVehiculo(), LocalDate.now());
+                .existsByVehiculo_IdVehiculoAndFechaCitaReservaGreaterThanEqual(dto.getIdVehiculo(), LocalDate.now());
+
 
         if (yaTieneReservaFutura) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Este vehículo ya tiene una reserva pendiente.");
@@ -185,6 +186,12 @@ public class ReservaServiceImpl {
         return reservaRepository.findByVehiculoIdVehiculo(idVehiculo);
     }
 
+    public boolean tieneReservaActivaOFutura(Integer idVehiculo) {
+        LocalDate hoy = LocalDate.now();
+
+        return reservaRepository.findByVehiculoIdVehiculo(idVehiculo).stream()
+                .anyMatch(r -> !r.getFechaCitaReserva().toLocalDate().isBefore(hoy));
+    }
 
 
 
