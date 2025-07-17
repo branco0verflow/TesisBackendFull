@@ -1,6 +1,7 @@
 package com.sgc.controllers;
 
 import com.sgc.dtos.DisponibilidadDTO;
+import com.sgc.dtos.ProximaDisponibilidadDTO;
 import com.sgc.dtos.TimeRangeDTO;
 import com.sgc.services.DisponibilidadService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,6 +23,16 @@ public class DisponibilidadController {
     public DisponibilidadController(DisponibilidadService disponibilidadService) {
         this.disponibilidadService = disponibilidadService;
     }
+
+    @GetMapping("/proxima-disponibilidad")
+    public ResponseEntity<List<ProximaDisponibilidadDTO>> getProximaDisponibilidad(
+            @RequestParam int minutosRequeridos,
+            @RequestParam(defaultValue = "15") int limiteDias) {
+
+        List<ProximaDisponibilidadDTO> disponibilidad = disponibilidadService.buscarProximaDisponibilidadPorMecanico(minutosRequeridos, limiteDias);
+        return ResponseEntity.ok(disponibilidad);
+    }
+
 
     @GetMapping
     public ResponseEntity<List<LocalDate>> obtenerDiasDisponibles(

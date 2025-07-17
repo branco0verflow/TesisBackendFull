@@ -2,6 +2,7 @@ package com.sgc.services;
 
 import com.sgc.domains.*;
 import com.sgc.dtos.DisponibilidadDTO;
+import com.sgc.dtos.ProximaDisponibilidadDTO;
 import com.sgc.dtos.TimeRangeDTO;
 import com.sgc.repositories.MecanicoRepository;
 import com.sgc.repositories.TareaRepository;
@@ -172,7 +173,42 @@ public class DisponibilidadService {
     }
 
 
+    // Necesito esto para que las administradoras tengan acceso a la próxima disponibilidad de cada mecánico
+    public List<ProximaDisponibilidadDTO> buscarProximaDisponibilidadPorMecanico(int minutosRequeridos, int limiteDias) {
+        List<Mecanico> mecanicos = mecanicoRepo.findAll();
+        List<ProximaDisponibilidadDTO> resultados = new ArrayList<>();
+        LocalDate hoy = LocalDate.now().plusDays(2); // inicio búsqueda desde pasado mañana
 
+        for (Mecanico mecanico : mecanicos) {
+            for (int i = 0; i < limiteDias; i++) {
+                LocalDate fecha = hoy.plusDays(i);
+                List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), fecha);
+                List<TimeRange> huecos = calcularHuecos(tareasDelDia);
+
+                for (TimeRange hueco : huecos) {
+                    if (hueco.duracionEnMinutos() >= minutosRequeridos) {
+                        LocalTime inicio = hueco.getInicio();
+                        LocalTime fin = inicio.plusMinutes(minutosRequeridos);
+
+                        resultados.add(new ProximaDisponibilidadDTO(
+                                mecanico.getIdMecanico(),
+                                mecanico.getNombreMecanico(),
+                                fecha,
+                                inicio,
+                                fin
+                        ));
+                        break; // Ya encontré el primer hueco de este mecánico
+                    }
+                }
+
+                if (resultados.stream().anyMatch(r -> r.getIdMecanico() == mecanico.getIdMecanico())) {
+                    break; // Ya tengo la disponibilidad de este mecánico
+                }
+            }
+        }
+
+        return resultados;
+    }
 
 
 
