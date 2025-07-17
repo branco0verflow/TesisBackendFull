@@ -9,6 +9,7 @@ import com.sgc.repositories.TareaRepository;
 import com.sgc.repositories.TipoTareaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -35,13 +36,11 @@ public class DisponibilidadService {
     }
 
     public List<LocalDate> buscarDiasDisponibles(List<Integer> idTipoTareas, int limiteDias) {
-        // 1. Obtener las tareas seleccionadas
         List<TipoTarea> tareas = tipoTareaRepo.findAllById(idTipoTareas);
         int minutosTotales = tareas.stream()
                 .mapToInt(TipoTarea::getTiempoMinutosTipoTarea)
                 .sum();
 
-        // 2. Buscar un mecánico que sepa hacer todas las tareas
         List<Mecanico> mecanicos = mecanicoRepo.findAll();
 
         Optional<Mecanico> mecanicoOpt = mecanicos.stream()
@@ -59,25 +58,81 @@ public class DisponibilidadService {
 
         Mecanico mecanico = mecanicoOpt.get();
 
-        // 3. Buscar huecos por día
         List<LocalDate> diasDisponibles = new ArrayList<>();
         LocalDate hoy = LocalDate.now().plusDays(2);
 
         for (int i = 0; i < limiteDias; i++) {
             LocalDate dia = hoy.plusDays(i);
             List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), dia);
-
             List<TimeRange> huecos = calcularHuecos(tareasDelDia);
 
-            boolean hayHueco = huecos.stream()
-                    .anyMatch(h -> h.duracionEnMinutos() >= minutosTotales);
-
-            if (hayHueco) {
+            Optional<TimeRange> bloque = encontrarBloqueAcumulado(huecos, minutosTotales);
+            if (bloque.isPresent()) {
                 diasDisponibles.add(dia);
             }
         }
 
         return diasDisponibles;
+    }
+
+    public List<DisponibilidadDTO> buscarHorasDisponibles(List<Integer> idTipoTareas, LocalDate fecha) {
+        List<TipoTarea> tareas = tipoTareaRepo.findAllById(idTipoTareas);
+        int minutosTotales = tareas.stream()
+                .mapToInt(TipoTarea::getTiempoMinutosTipoTarea)
+                .sum();
+
+        List<Mecanico> mecanicos = mecanicoRepo.findAll();
+
+        List<Mecanico> mecanicosCompatibles = mecanicos.stream()
+                .filter(m -> {
+                    Set<Integer> tareasQueHace = m.getTipoTarea().stream()
+                            .map(TipoTarea::getIdTipoTarea)
+                            .collect(Collectors.toSet());
+                    return tareasQueHace.containsAll(idTipoTareas);
+                })
+                .collect(Collectors.toList());
+
+        List<DisponibilidadDTO> resultados = new ArrayList<>();
+
+        for (Mecanico mecanico : mecanicosCompatibles) {
+            List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), fecha);
+            List<TimeRange> huecos = calcularHuecos(tareasDelDia);
+
+            Optional<TimeRange> bloque = encontrarBloqueAcumulado(huecos, minutosTotales);
+            bloque.ifPresent(b -> resultados.add(
+                    new DisponibilidadDTO(mecanico.getIdMecanico(), b.getInicio(), b.getFin())
+            ));
+        }
+
+        return resultados;
+    }
+
+    public List<ProximaDisponibilidadDTO> buscarProximaDisponibilidadPorMecanico(int minutosRequeridos, int limiteDias) {
+        List<Mecanico> mecanicos = mecanicoRepo.findAll();
+        List<ProximaDisponibilidadDTO> resultados = new ArrayList<>();
+        LocalDate hoy = LocalDate.now().plusDays(2);
+
+        for (Mecanico mecanico : mecanicos) {
+            for (int i = 0; i < limiteDias; i++) {
+                LocalDate fecha = hoy.plusDays(i);
+                List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), fecha);
+                List<TimeRange> huecos = calcularHuecos(tareasDelDia);
+
+                Optional<TimeRange> bloque = encontrarBloqueAcumulado(huecos, minutosRequeridos);
+                if (bloque.isPresent()) {
+                    resultados.add(new ProximaDisponibilidadDTO(
+                            mecanico.getIdMecanico(),
+                            mecanico.getNombreMecanico(),
+                            fecha,
+                            bloque.get().getInicio(),
+                            bloque.get().getFin()
+                    ));
+                    break;
+                }
+            }
+        }
+
+        return resultados;
     }
 
     private List<TimeRange> calcularHuecos(List<Tarea> tareasDelDia) {
@@ -111,106 +166,38 @@ public class DisponibilidadService {
             }
         }
 
-
         return huecos;
     }
 
+    private Optional<TimeRange> encontrarBloqueAcumulado(List<TimeRange> huecos, int minutosNecesarios) {
+        for (int i = 0; i < huecos.size(); i++) {
+            LocalTime inicio = huecos.get(i).getInicio();
+            LocalTime cursor = inicio;
+            int acumulado = 0;
 
-    public List<DisponibilidadDTO> buscarHorasDisponibles(List<Integer> idTipoTareas, LocalDate fecha) {
-        List<TipoTarea> tareas = tipoTareaRepo.findAllById(idTipoTareas);
-        int minutosTotales = tareas.stream()
-                .mapToInt(TipoTarea::getTiempoMinutosTipoTarea)
-                .sum();
+            for (int j = i; j < huecos.size(); j++) {
+                TimeRange bloque = huecos.get(j);
 
-        List<Mecanico> mecanicos = mecanicoRepo.findAll();
-
-        List<Mecanico> mecanicosCompatibles = mecanicos.stream()
-                .filter(m -> {
-                    Set<Integer> tareasQueHace = m.getTipoTarea().stream()
-                            .map(TipoTarea::getIdTipoTarea)
-                            .collect(Collectors.toSet());
-                    return tareasQueHace.containsAll(idTipoTareas);
-                })
-                .collect(Collectors.toList());
-
-        List<DisponibilidadDTO> resultados = new ArrayList<>();
-
-        for (Mecanico mecanico : mecanicosCompatibles) {
-            List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), fecha);
-            List<TimeRange> huecos = calcularHuecos(tareasDelDia);
-
-            for (int i = 0; i < huecos.size(); i++) {
-                LocalTime inicio = huecos.get(i).getInicio();
-                int acumulado = 0;
-                LocalTime cursor = inicio;
-
-                for (int j = i; j < huecos.size(); j++) {
-                    TimeRange bloque = huecos.get(j);
-
-                    if (cursor.isBefore(bloque.getInicio())) {
-                        cursor = bloque.getInicio();
-                    }
-
-                    int minutosRestantesEnBloque = (int) java.time.Duration.between(cursor, bloque.getFin()).toMinutes();
-                    if (minutosRestantesEnBloque <= 0) continue;
-
-                    acumulado += minutosRestantesEnBloque;
-
-                    if (acumulado >= minutosTotales) {
-                        LocalTime fin = cursor.plusMinutes(minutosTotales - (acumulado - minutosRestantesEnBloque));
-                        resultados.add(new DisponibilidadDTO(mecanico.getIdMecanico(), inicio, fin));
-                        break;
-                    }
-
-                    cursor = bloque.getFin();
-                }
-            }
-
-            if (!resultados.isEmpty()) break; // opcional: si solo querés mostrar disponibilidad de un mecánico
-        }
-
-        return resultados;
-    }
-
-
-    // Necesito esto para que las administradoras tengan acceso a la próxima disponibilidad de cada mecánico
-    public List<ProximaDisponibilidadDTO> buscarProximaDisponibilidadPorMecanico(int minutosRequeridos, int limiteDias) {
-        List<Mecanico> mecanicos = mecanicoRepo.findAll();
-        List<ProximaDisponibilidadDTO> resultados = new ArrayList<>();
-        LocalDate hoy = LocalDate.now().plusDays(2); // inicio búsqueda desde pasado mañana
-
-        for (Mecanico mecanico : mecanicos) {
-            for (int i = 0; i < limiteDias; i++) {
-                LocalDate fecha = hoy.plusDays(i);
-                List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), fecha);
-                List<TimeRange> huecos = calcularHuecos(tareasDelDia);
-
-                for (TimeRange hueco : huecos) {
-                    if (hueco.duracionEnMinutos() >= minutosRequeridos) {
-                        LocalTime inicio = hueco.getInicio();
-                        LocalTime fin = inicio.plusMinutes(minutosRequeridos);
-
-                        resultados.add(new ProximaDisponibilidadDTO(
-                                mecanico.getIdMecanico(),
-                                mecanico.getNombreMecanico(),
-                                fecha,
-                                inicio,
-                                fin
-                        ));
-                        break; // Ya encontré el primer hueco de este mecánico
-                    }
+                if (cursor.isBefore(bloque.getInicio())) {
+                    cursor = bloque.getInicio();
                 }
 
-                if (resultados.stream().anyMatch(r -> r.getIdMecanico() == mecanico.getIdMecanico())) {
-                    break; // Ya tengo la disponibilidad de este mecánico
+                int disponibles = (int) Duration.between(cursor, bloque.getFin()).toMinutes();
+                if (disponibles <= 0) continue;
+
+                acumulado += disponibles;
+
+                if (acumulado >= minutosNecesarios) {
+                    LocalTime fin = cursor.plusMinutes(minutosNecesarios - (acumulado - disponibles));
+                    return Optional.of(new TimeRange(inicio, fin));
                 }
+
+                cursor = bloque.getFin();
             }
         }
 
-        return resultados;
+        return Optional.empty();
     }
-
-
-
 }
+
 
