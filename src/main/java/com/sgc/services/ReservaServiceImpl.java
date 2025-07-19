@@ -44,6 +44,9 @@ public class ReservaServiceImpl {
     @Autowired
     private TareaRepository tareaRepository;
 
+    @Autowired
+    private NotificacionService notificacionService;
+
 
     public List<Reserva> getReserva() {
         return reservaRepository.findAll();
@@ -111,6 +114,11 @@ public class ReservaServiceImpl {
 
         tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, si no queda el espacio disponible en la interfaz de admin. BB
 
+        notificacionService.enviarSMS(cliente.getTelefonoCliente(),
+                "Hola " + cliente.getNombreCliente() +
+                        ", su reserva fue confirmada para el día " + reserva.getFechaCitaReserva() +
+                        " a las " + reserva.getHoraInicioReserva() + ".");
+
         return reservaRepository.save(reserva);
     }
 
@@ -153,6 +161,12 @@ public class ReservaServiceImpl {
 
         // Después crear la tarea asociada con reserva ya persistida
         tareaService.createTareaFromReserva(reservaGuardada);
+
+        notificacionService.enviarSMS(cliente.getTelefonoCliente(),
+                "Hola " + cliente.getNombreCliente() +
+                        ", su reserva fue confirmada para el día " + reserva.getFechaCitaReserva() +
+                        " a las " + reserva.getHoraInicioReserva() + ".");
+
 
         return reservaGuardada;
     }
