@@ -23,7 +23,7 @@ public class MensajeReservaBuilder {
 
     public static String buildMensajeCreacion(String nombreCliente, LocalDate fecha, LocalTime hora) {
         return "Hola " + nombreCliente + ", su reserva fue confirmada para el día " +
-                formatFecha(fecha) + " a las " + formatHora(hora) + ".";
+                formatFecha(fecha) + " a las " + formatHora(hora) + ". Asista con 30 minutos de anticipación. Gracias - Taller Videsol";
     }
 
     public static String buildMensajeModificacion(String nombreCliente, LocalDate nuevaFecha, LocalTime nuevaHora) {

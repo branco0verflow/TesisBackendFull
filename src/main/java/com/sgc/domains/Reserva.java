@@ -64,7 +64,8 @@ public class Reserva {
     @NotNull(message = "El mecánico es obligatorio")
     private Mecanico mecanico;
 
-
+    @Column(name = "recordatorio_enviado")
+    private boolean recordatorioEnviado = false;
 
 
     public Reserva() {}
@@ -90,7 +91,7 @@ public class Reserva {
         this.mecanico = mecanico;
     }
 
-    // Getters y Setters
+
 
     public Integer getIdReserva() {
         return idReserva;
@@ -175,4 +176,13 @@ public class Reserva {
     public void setMecanico(Mecanico mecanico) {
         this.mecanico = mecanico;
     }
+
+    public boolean isRecordatorioEnviado() {
+        return recordatorioEnviado;
+    }
+
+    public void setRecordatorioEnviado(boolean recordatorioEnviado) {
+        this.recordatorioEnviado = recordatorioEnviado;
+    }
+
 }

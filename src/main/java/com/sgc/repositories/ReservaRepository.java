@@ -34,6 +34,9 @@ public interface ReservaRepository extends JpaRepository<Reserva,Integer> {
 
     boolean existsByVehiculo_IdVehiculoAndFechaCitaReservaGreaterThanEqual(Integer idVehiculo, LocalDate fecha);
 
+    List<Reserva> findByFechaCitaReservaAndRecordatorioEnviadoFalse(LocalDate fechaCitaReserva);
+    // Necesario para envío de mensajes recordatorios.
+
 
 
 }
