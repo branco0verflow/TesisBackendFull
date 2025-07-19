@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,9 @@ public class TareaServiceImpl {
 
     @Autowired
     private AdministradorRepository administradorRepository;
+
+    @Autowired
+    private NotificacionService notificacionService;
 
 
     public List<Tarea> getTareas() {
@@ -85,6 +90,9 @@ public class TareaServiceImpl {
     public Optional<Tarea> patchTarea(Integer idTarea, TareaDTO dto) {
         return tareaRepository.findById(idTarea).map(tarea -> {
 
+            LocalDate fechaAnterior = tarea.getFechaTarea();
+            LocalTime horaAnterior = tarea.getHoraIngresoTarea().toLocalTime();
+
             if (dto.getFechaCreadaTarea() != null)
                 tarea.setFechaCreadaTarea(dto.getFechaCreadaTarea());
 
@@ -127,10 +135,39 @@ public class TareaServiceImpl {
                 tarea.setAdministrador(administrador);
             }
 
+            Tarea tareaActualizada = tareaRepository.save(tarea);
 
-            return tareaRepository.save(tarea);
+            // Si la tarea está asociada a una reserva y fue modificada en fecha u hora, sincronizar y notificar
+            if (Boolean.TRUE.equals(tarea.getEsReservaTarea()) && tarea.getReserva() != null) {
+                Reserva reserva = tarea.getReserva();
+
+                boolean cambioFecha = dto.getFechaTarea() != null &&
+                        !Objects.equals(reserva.getFechaCitaReserva().toLocalDate(), tarea.getFechaTarea());
+
+                boolean cambioHora = dto.getHoraIngresoTarea() != null &&
+                        !Objects.equals(reserva.getHoraInicioReserva().toLocalTime(), tarea.getHoraIngresoTarea().toLocalTime());
+
+                if (cambioFecha || cambioHora) {
+                    // Sincronizar reserva
+                    reserva.setFechaCitaReserva(Date.valueOf(tarea.getFechaTarea()));
+                    reserva.setHoraInicioReserva(Time.valueOf(tarea.getHoraIngresoTarea().toLocalTime()));
+                    reservaRepository.save(reserva);
+
+                    // Notificar al cliente
+                    Cliente cliente = reserva.getCliente();
+                    notificacionService.notificarReservaModificada(
+                            cliente.getTelefonoCliente(),
+                            cliente.getNombreCliente(),
+                            tarea.getFechaTarea(),
+                            tarea.getHoraIngresoTarea().toLocalTime()
+                    );
+                }
+            }
+
+            return tareaActualizada;
         });
     }
+
 
 
 
@@ -141,17 +178,47 @@ public class TareaServiceImpl {
 
         Tarea tarea = optionalTarea.get();
 
-        // Desvincular relaciones
+        // Si tiene reserva asociada, eliminarla también
+        if (tarea.getEsReservaTarea() != null && tarea.getEsReservaTarea() && tarea.getReserva() != null) {
+            Reserva reserva = tarea.getReserva();
+
+            // Guardar datos necesarios para notificación antes de eliminar
+            String nombreCliente = reserva.getCliente().getNombreCliente();
+            String numeroCliente = reserva.getCliente().getTelefonoCliente();
+            LocalDate fecha = reserva.getFechaCitaReserva().toLocalDate();
+            LocalTime hora = reserva.getHoraInicioReserva().toLocalTime();
+
+            // Desvincular por las dudas, errores por este motivo
+            if (reserva.getTipoTarea() != null) {
+                reserva.getTipoTarea().clear();
+            }
+            reserva.setCliente(null);
+            reserva.setVehiculo(null);
+            reserva.setMecanico(null);
+            reserva.setEstado(null);
+
+            // Eliminar reserva
+            reservaRepository.delete(reserva);
+
+            // Enviar notificación
+            notificacionService.notificarReservaCanceladaPorTaller(
+                    numeroCliente,
+                    nombreCliente,
+                    fecha,
+                    hora
+            );
+        }
+
+        // Desvincular campos de la tarea antes de eliminar
         tarea.setReserva(null);
         tarea.setMecanico(null);
         tarea.setEstado(null);
         tarea.setAdministrador(null);
 
-
-        // Eliminar luego de desvincular
         tareaRepository.delete(tarea);
         return true;
     }
+
 
 
     // No se usa este metodo, ver borrar BB

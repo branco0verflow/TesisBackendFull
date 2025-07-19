@@ -60,7 +60,6 @@ public class ReservaServiceImpl {
     public Reserva createReserva(ReservaDTO dto) {
         Reserva reserva = new Reserva();
 
-
         reserva.setFechaCreadaReserva(java.sql.Date.valueOf(LocalDate.now()));
         reserva.setFechaCitaReserva(dto.getFechaCitaReserva());
         reserva.setHoraInicioReserva(dto.getHoraInicioReserva());
@@ -89,7 +88,7 @@ public class ReservaServiceImpl {
                     Vehiculo nuevo = new Vehiculo();
                     Modelo modelo = new Modelo();
                     modelo.setIdModelo(vehiculoDTO.getIdModelo());
-                    nuevo.setModelo(modelo); // asumir que el modelo ya existe
+                    nuevo.setModelo(modelo);
                     nuevo.setNroChasisVehiculo(vehiculoDTO.getNroChasisVehiculo());
                     nuevo.setNroMotorVehiculo(vehiculoDTO.getNroMotorVehiculo());
                     nuevo.setAnoVehiculo(vehiculoDTO.getAnoVehiculo());
@@ -109,18 +108,24 @@ public class ReservaServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Estado no encontrado"));
         reserva.setEstado(estado);
 
-        Mecanico mecanico = mecanicoRepository.findById(dto.getIdMecanico()).orElseThrow(() -> new RuntimeException("Mecánico no encontrado"));
+        Mecanico mecanico = mecanicoRepository.findById(dto.getIdMecanico())
+                .orElseThrow(() -> new RuntimeException("Mecánico no encontrado"));
         reserva.setMecanico(mecanico);
 
-        tareaService.createTareaFromReserva(reserva); // Aca se crea la Tarea de forma automática, si no queda el espacio disponible en la interfaz de admin. BB
+        // Crear tarea asociada
+        tareaService.createTareaFromReserva(reserva);
 
-        notificacionService.enviarSMS(cliente.getTelefonoCliente(),
-                "Hola " + cliente.getNombreCliente() +
-                        ", su reserva fue confirmada para el día " + reserva.getFechaCitaReserva() +
-                        " a las " + reserva.getHoraInicioReserva() + ".");
+        notificacionService.notificarReservaCreada(
+                cliente.getTelefonoCliente(),
+                cliente.getNombreCliente(),
+                reserva.getFechaCitaReserva().toLocalDate(),
+                reserva.getHoraInicioReserva().toLocalTime()
+        );
+
 
         return reservaRepository.save(reserva);
     }
+
 
     // Esto resuelve poder crear Reservas desde CrearReservaSeguimiento.js (para reservas con Clientes y vehículos ya rehistrados)
     public Reserva createReservaDesdeIds(ReservaNuevaDTO dto) {
@@ -162,10 +167,12 @@ public class ReservaServiceImpl {
         // Después crear la tarea asociada con reserva ya persistida
         tareaService.createTareaFromReserva(reservaGuardada);
 
-        notificacionService.enviarSMS(cliente.getTelefonoCliente(),
-                "Hola " + cliente.getNombreCliente() +
-                        ", su reserva fue confirmada para el día " + reserva.getFechaCitaReserva() +
-                        " a las " + reserva.getHoraInicioReserva() + ".");
+        notificacionService.notificarReservaCreada(
+                cliente.getTelefonoCliente(),
+                cliente.getNombreCliente(),
+                reserva.getFechaCitaReserva().toLocalDate(),
+                reserva.getHoraInicioReserva().toLocalTime()
+        );
 
 
         return reservaGuardada;
@@ -178,20 +185,36 @@ public class ReservaServiceImpl {
 
         Reserva reserva = optionalReserva.get();
 
+        // Enviar notificación de cancelación (si hay cliente asociado)
+        if (reserva.getCliente() != null) {
+            notificacionService.notificarReservaCanceladaPorCliente(
+                    reserva.getCliente().getTelefonoCliente(),
+                    reserva.getCliente().getNombreCliente(),
+                    reserva.getFechaCitaReserva().toLocalDate(),
+                    reserva.getHoraInicioReserva().toLocalTime()
+            );
+        }
 
-        // Así desvinculo las relaciones en la tabla reserva_tipo_tarea (importante)
+        // Desvincular relaciones
         if (reserva.getTipoTarea() != null) {
             reserva.getTipoTarea().clear();
         }
 
-        // buscar y eliminar la tarea asociada
-        Optional<Tarea> tareaOptional = tareaRepository.findByReservaIdReserva(idReserva);
-        tareaOptional.ifPresent(tarea -> tareaService.eliminarTareaSegura(tarea.getIdTarea()));
+        reserva.setCliente(null);
+        reserva.setVehiculo(null);
+        reserva.setMecanico(null);
+        reserva.setEstado(null);
 
-        // eliminar la reserva
+        // Buscar y eliminar la tarea asociada
+        tareaRepository.findByReservaIdReserva(idReserva)
+                .ifPresent(tarea -> tareaService.eliminarTareaSegura(tarea.getIdTarea()));
+
+        // Finalmente eliminar la reserva
         reservaRepository.delete(reserva);
+
         return true;
     }
+
 
 
 
