@@ -27,7 +27,7 @@ public class DisponibilidadController {
     @GetMapping("/proxima-disponibilidad")
     public ResponseEntity<List<ProximaDisponibilidadDTO>> getProximaDisponibilidad(
             @RequestParam int minutosRequeridos,
-            @RequestParam(defaultValue = "15") int limiteDias) {
+            @RequestParam(defaultValue = "35") int limiteDias) {
 
         List<ProximaDisponibilidadDTO> disponibilidad = disponibilidadService.buscarProximaDisponibilidadPorMecanico(minutosRequeridos, limiteDias);
         return ResponseEntity.ok(disponibilidad);
@@ -37,7 +37,7 @@ public class DisponibilidadController {
     @GetMapping
     public ResponseEntity<List<LocalDate>> obtenerDiasDisponibles(
             @RequestParam List<Integer> ids,
-            @RequestParam(defaultValue = "20") int limiteDias
+            @RequestParam(defaultValue = "30") int limiteDias
     ) {
         List<LocalDate> dias = disponibilidadService.buscarDiasDisponibles(ids, limiteDias);
         return ResponseEntity.ok(dias);

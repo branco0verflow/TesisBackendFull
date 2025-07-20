@@ -4,9 +4,11 @@ import com.sgc.domains.*;
 import com.sgc.dtos.DisponibilidadDTO;
 import com.sgc.dtos.ProximaDisponibilidadDTO;
 import com.sgc.dtos.TimeRangeDTO;
+import com.sgc.repositories.ExcepcionHorariaRepository;
 import com.sgc.repositories.MecanicoRepository;
 import com.sgc.repositories.TareaRepository;
 import com.sgc.repositories.TipoTareaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -22,6 +24,9 @@ public class DisponibilidadService {
     private final MecanicoRepository mecanicoRepo;
     private final TareaRepository tareaRepo;
     private final HorarioLaboral horarioLaboral;
+    @Autowired
+    private ExcepcionHorariaRepository excepcionRepo;
+
 
     public DisponibilidadService(
             TipoTareaRepository tipoTareaRepo,
@@ -63,6 +68,11 @@ public class DisponibilidadService {
 
         for (int i = 0; i < limiteDias; i++) {
             LocalDate dia = hoy.plusDays(i);
+
+            if (excepcionRepo.existsByFecha(dia)) {
+                continue;
+            }
+
             List<Tarea> tareasDelDia = tareaRepo.findByMecanicoAndFecha(mecanico.getIdMecanico(), dia);
             List<TimeRange> huecos = calcularHuecos(tareasDelDia);
 
@@ -71,6 +81,7 @@ public class DisponibilidadService {
                 diasDisponibles.add(dia);
             }
         }
+
 
         return diasDisponibles;
     }
