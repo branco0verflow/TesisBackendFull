@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -220,6 +221,51 @@ public class TareaServiceImpl {
     }
 
 
+    public void generarTareasReten(List<Integer> idsMecanicos, LocalDate desde, LocalDate hasta) {
+        List<Mecanico> mecanicos = mecanicoRepository.findAllById(idsMecanicos).stream()
+                .filter(Mecanico::getActivoMecanico)
+                .toList();
+
+        if (mecanicos.isEmpty()) {
+            throw new IllegalArgumentException("No hay mecánicos activos seleccionados");
+        }
+
+        int cantidadMecanicos = mecanicos.size();
+        if (cantidadMecanicos > 2) {
+            throw new IllegalArgumentException("Solo se permite generar tareas retén para uno o dos mecánicos");
+        }
+
+        LocalDate actual = desde.with(DayOfWeek.MONDAY);
+        int turno = 0;
+
+        while (!actual.isAfter(hasta)) {
+            Mecanico mecanicoAsignado = mecanicos.get(turno % cantidadMecanicos);
+
+            for (int i = 0; i < 5; i++) {
+                LocalDate dia = actual.plusDays(i);
+
+                if (dia.getDayOfWeek().getValue() <= 5) {
+                    Tarea tarea = new Tarea();
+                    tarea.setFechaCreadaTarea(Date.valueOf(LocalDate.now())); // LocalDate -> java.sql.Date
+                    tarea.setFechaTarea(dia);                   // LocalDate -> java.sql.Date
+                    tarea.setHoraIngresoTarea(Time.valueOf(LocalTime.of(15, 30))); // LocalTime -> java.sql.Time
+                    tarea.setHoraFinTarea(Time.valueOf(LocalTime.of(17, 30)));     // LocalTime -> java.sql.Time
+                    tarea.setDescripcionTarea("Es tarea retén");
+                    tarea.setMecanico(mecanicoAsignado);
+                    tarea.setEsReservaTarea(false);
+
+
+                    tarea.setEstado(estadoRepository.findByIdEstado(2)
+                            .orElseThrow(() -> new RuntimeException("Estado 'Confirmado' no encontrado")));
+
+                    tareaRepository.save(tarea);
+                }
+            }
+
+            actual = actual.plusWeeks(1);
+            turno++;
+        }
+    }
 
     // No se usa este metodo, ver borrar BB
     public boolean deleteTarea(Integer idTarea) {

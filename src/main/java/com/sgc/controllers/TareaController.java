@@ -55,6 +55,12 @@ public class TareaController {
     }
 
 
+    @PostMapping("/reten")
+    public ResponseEntity<String> generarTareasReten(@RequestBody RetenRequest request) {
+        tareaService.generarTareasReten(request.getIdsMecanicos(), request.getDesde(), request.getHasta());
+        return ResponseEntity.ok("Tareas de retén generadas exitosamente.");
+    }
+
 
     @PutMapping("/{idTarea}") // No parece necesario actualizar T-ODO el objeto, ya que datos que no se alteren
     public ResponseEntity<?> putTarea(@PathVariable Integer idTarea, @Valid @RequestBody TareaDTO tareaDTO) {
