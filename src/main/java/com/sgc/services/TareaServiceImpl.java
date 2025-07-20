@@ -230,6 +230,9 @@ public class TareaServiceImpl {
             throw new IllegalArgumentException("No hay mecánicos activos seleccionados");
         }
 
+        Administrador adminSeleccionado = administradorRepository.findById(1).orElseThrow(() -> new RuntimeException("Administrador con idAdmin 1, no encontrado."));
+
+
         int cantidadMecanicos = mecanicos.size();
         if (cantidadMecanicos > 2) {
             throw new IllegalArgumentException("Solo se permite generar tareas retén para uno o dos mecánicos");
@@ -252,6 +255,7 @@ public class TareaServiceImpl {
                     tarea.setHoraFinTarea(Time.valueOf(LocalTime.of(17, 30)));     // LocalTime -> java.sql.Time
                     tarea.setDescripcionTarea("Es tarea retén");
                     tarea.setMecanico(mecanicoAsignado);
+                    tarea.setAdministrador(adminSeleccionado);
                     tarea.setEsReservaTarea(false);
 
 
