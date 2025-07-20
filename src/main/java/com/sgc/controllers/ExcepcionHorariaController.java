@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/excepciones")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class ExcepcionHorariaController {
 
     @Autowired
