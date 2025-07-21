@@ -200,11 +200,6 @@ public class ReservaServiceImpl {
             reserva.getTipoTarea().clear();
         }
 
-        reserva.setCliente(null);
-        reserva.setVehiculo(null);
-        reserva.setMecanico(null);
-        reserva.setEstado(null);
-
         // Buscar y eliminar la tarea asociada
         tareaRepository.findByReservaIdReserva(idReserva)
                 .ifPresent(tarea -> tareaService.eliminarTareaSegura(tarea.getIdTarea()));

@@ -37,7 +37,7 @@ public class DisponibilidadController {
     @GetMapping
     public ResponseEntity<List<LocalDate>> obtenerDiasDisponibles(
             @RequestParam List<Integer> ids,
-            @RequestParam(defaultValue = "30") int limiteDias
+            @RequestParam(defaultValue = "35") int limiteDias
     ) {
         List<LocalDate> dias = disponibilidadService.buscarDiasDisponibles(ids, limiteDias);
         return ResponseEntity.ok(dias);
