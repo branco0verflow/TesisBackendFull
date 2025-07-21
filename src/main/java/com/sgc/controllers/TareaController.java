@@ -2,6 +2,8 @@ package com.sgc.controllers;
 
 import com.sgc.domains.Tarea;
 import com.sgc.dtos.TareaDTO;
+import com.sgc.dtos.TareaPendienteDTO;
+import com.sgc.repositories.TareaRepository;
 import com.sgc.services.TareaServiceImpl;
 import com.sgc.dtos.RetenRequest;
 import jakarta.validation.Valid;
@@ -22,6 +24,9 @@ public class TareaController {
 
     @Autowired
     private TareaServiceImpl tareaService;
+
+    @Autowired
+    private TareaRepository tareaRepository;
 
     // CRUD básico
 

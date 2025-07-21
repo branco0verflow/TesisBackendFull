@@ -2,13 +2,14 @@ package com.sgc.dtos;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
 
 public class TareaPendienteDTO {
     private Integer idTarea;
-    private Date fecha;
+    private LocalDate fecha;
     private Time hora;
 
-    public TareaPendienteDTO(Integer idTarea, Date fecha, Time hora) {
+    public TareaPendienteDTO(Integer idTarea, LocalDate fecha, Time hora) {
         this.idTarea = idTarea;
         this.fecha = fecha;
         this.hora = hora;
@@ -22,11 +23,11 @@ public class TareaPendienteDTO {
         this.idTarea = idTarea;
     }
 
-    public Date getFecha() {
+    public LocalDate getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
     }
 

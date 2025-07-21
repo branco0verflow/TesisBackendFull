@@ -22,5 +22,7 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
 
     Optional<Tarea> findByReservaIdReserva(Integer idReserva);
 
+    List<Tarea> findByEstado_IdEstado(Integer idEstado);
+
 
 }
