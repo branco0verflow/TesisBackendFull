@@ -86,5 +86,19 @@ public class TareaController {
         }
     }
 
+    @GetMapping("/pendientes")
+    public ResponseEntity<List<TareaPendienteDTO>> obtenerTareasPendientes() {
+        List<Tarea> pendientes = tareaRepository.findByEstado_IdEstado(1);
+        List<TareaPendienteDTO> resultado = pendientes.stream()
+                .map(t -> new TareaPendienteDTO(
+                        t.getIdTarea(),
+                        t.getFechaTarea(),
+                        t.getHoraIngresoTarea()
+                ))
+                .toList();
+        return ResponseEntity.ok(resultado);
+    }
+
+
 
 }
