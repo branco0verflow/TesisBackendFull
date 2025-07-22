@@ -4,7 +4,9 @@ import com.sgc.domains.Mecanico;
 import com.sgc.domains.TipoTarea;
 import com.sgc.dtos.MecanicoDTO;
 import com.sgc.repositories.MecanicoRepository;
+import com.sgc.repositories.ReservaRepository;
 import com.sgc.repositories.TipoTareaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,36 @@ public class MecanicoServiceImpl {
     private TipoTareaRepository tipoTareaRepository;
 
     @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    public List<MecanicoDTO> getMecanicosDTO(){ return mecanicoRepository.findAll().stream().map(this::mapEntityToDTO).toList();}
 
     public List<Mecanico> getMecanicos(){ return mecanicoRepository.findAll();}
 
+    public Optional<MecanicoDTO> getMecanicoDTOById(Integer idMecanico) {
+        return mecanicoRepository.findById(idMecanico)
+                .map(this::mapEntityToDTO);
+    }
+
+    private MecanicoDTO mapEntityToDTO(Mecanico mecanico) {
+        MecanicoDTO dto = new MecanicoDTO();
+        dto.setIdMecanico(mecanico.getIdMecanico());
+        dto.setNombreMecanico(mecanico.getNombreMecanico());
+        dto.setApellidoMecanico(mecanico.getApellidoMecanico());
+        dto.setEmailMecanico(mecanico.getEmailMecanico());
+        dto.setActivoMecanico(mecanico.getActivoMecanico());
+        dto.setTipoTareaIds(
+                mecanico.getTipoTarea().stream()
+                        .map(TipoTarea::getIdTipoTarea)
+                        .toList()
+        );
+        return dto;
+    }
+
+    //Se empieza a usar la devolucion de mecanicoDTO
     public Optional<Mecanico> getMecanicoById(Integer idMecanico){ return mecanicoRepository.findById(idMecanico);}
 
     public Mecanico createMecanico(MecanicoDTO mecanicoDTO){
@@ -41,6 +69,7 @@ public class MecanicoServiceImpl {
                 });
     }
 
+    @Transactional
     public Optional<Mecanico> patchMecanico(Integer idMecanico, MecanicoDTO mecanicoDTO){
         return mecanicoRepository.findById(idMecanico)
                 .map(existente -> {
@@ -52,7 +81,7 @@ public class MecanicoServiceImpl {
                         List<TipoTarea> tipoTareas = tipoTareaRepository.findAllById(mecanicoDTO.getTipoTareaIds());
                         existente.setTipoTarea(tipoTareas);
                     }
-                    if(mecanicoDTO.getPasswordMecanico() != null) {
+                    if (mecanicoDTO.getPasswordMecanico() != null && !mecanicoDTO.getPasswordMecanico().isEmpty()) {
                         String encryptedPassword = passwordEncoder.encode(mecanicoDTO.getPasswordMecanico());
                         existente.setPasswordMecanico(encryptedPassword);
                     }
@@ -60,10 +89,15 @@ public class MecanicoServiceImpl {
                 });
     }
 
+    @Transactional
     public boolean deleteMecanico(Integer idMecanico){
         if(!mecanicoRepository.existsById(idMecanico)){
             return false;
         }
+
+        mecanicoRepository.deleteMecanicosRelationsFromTipoTarea(idMecanico);
+        mecanicoRepository.updateTareaOnMecanicoDelete(idMecanico);
+        reservaRepository.updateReservanOnMecanicoDelete(idMecanico);
         mecanicoRepository.deleteById(idMecanico);
         return true;
     }

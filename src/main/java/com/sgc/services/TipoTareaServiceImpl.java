@@ -1,7 +1,10 @@
 package com.sgc.services;
 
 import com.sgc.domains.TipoTarea;
+import com.sgc.repositories.MecanicoRepository;
+import com.sgc.repositories.ReservaRepository;
 import com.sgc.repositories.TipoTareaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,12 @@ public class TipoTareaServiceImpl {
 
     @Autowired
     private TipoTareaRepository tipoTareaRepository;
+
+    @Autowired
+    private ReservaRepository reservaRepository;
+
+    @Autowired
+    private MecanicoRepository mecanicoRepository;
 
     public List<TipoTarea> getTipoTarea() {
         return tipoTareaRepository.findAll();
@@ -43,10 +52,15 @@ public class TipoTareaServiceImpl {
                 });
     }
 
+    @Transactional
     public boolean deleteTipoTarea(Integer idTipoTarea) {
         if (!tipoTareaRepository.existsById(idTipoTarea)) {
             return false;
         }
+
+        mecanicoRepository.deleteTipoTareaRelationsFromMecanicos(idTipoTarea);
+        reservaRepository.deleteTipoTareaRelationsFromReservas(idTipoTarea);
+
         tipoTareaRepository.deleteById(idTipoTarea);
         return true;
     }

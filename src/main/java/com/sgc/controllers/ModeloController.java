@@ -1,6 +1,7 @@
 package com.sgc.controllers;
 
 import com.sgc.domains.Modelo;
+import com.sgc.dtos.ModeloDTO;
 import com.sgc.services.ModeloServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,8 @@ public class ModeloController {
 
 
     @PostMapping
-    public ResponseEntity<?> postModelo(@Valid @RequestBody Modelo modelo) {
-        Modelo nuevoModelo = modeloService.createModelo(modelo);
+    public ResponseEntity<?> postModelo(@Valid @RequestBody ModeloDTO modeloDTO) {
+        Modelo nuevoModelo = modeloService.createModelo(modeloDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{idModelo}")
@@ -61,15 +62,15 @@ public class ModeloController {
     }
 
     @PutMapping("/{idModelo}")
-    public ResponseEntity<?> putModelo(@PathVariable Integer idModelo, @Valid @RequestBody Modelo modelo) {
-        return modeloService.updateModelo(idModelo, modelo)
+    public ResponseEntity<?> putModelo(@PathVariable Integer idModelo, @Valid @RequestBody ModeloDTO modeloDTO) {
+        return modeloService.updateModelo(idModelo, modeloDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{idModelo}")
-    public ResponseEntity<?> patchModelo(@PathVariable Integer idModelo, @Valid @RequestBody Modelo modelo) {
-        return modeloService.patchModelo(idModelo, modelo)
+    public ResponseEntity<?> patchModelo(@PathVariable Integer idModelo, @Valid @RequestBody ModeloDTO modeloDTO) {
+        return modeloService.patchModelo(idModelo, modeloDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

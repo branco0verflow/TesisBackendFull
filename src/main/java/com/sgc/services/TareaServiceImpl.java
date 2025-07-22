@@ -12,6 +12,7 @@ import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -282,10 +283,11 @@ public class TareaServiceImpl {
 
     private void mapDTOToEntity(TareaDTO dto, Tarea tarea) {
         tarea.setFechaCreadaTarea(
-                dto.getFechaCreadaTarea() != null ?
-                        dto.getFechaCreadaTarea() :
-                        new java.sql.Date(System.currentTimeMillis())
+                dto.getFechaCreadaTarea() != null
+                        ? dto.getFechaCreadaTarea()
+                        : java.sql.Date.valueOf(LocalDate.now(ZoneId.of("America/Montevideo")))
         );
+
 
         tarea.setFechaTarea(dto.getFechaTarea());
         tarea.setHoraIngresoTarea(dto.getHoraIngresoTarea());
@@ -321,9 +323,9 @@ public class TareaServiceImpl {
                     .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
             tarea.setAdministrador(administrador);
         }
-        System.out.println("Existe admin? " + administradorRepository.existsById(dto.getIdAdmin()));
+        System.out.println("Exista admin ? " + administradorRepository.existsById(dto.getIdAdmin()));
         System.out.println("Existe estado? " + estadoRepository.existsById(dto.getIdEstado()));
-        System.out.println("Existe mecanico? " + mecanicoRepository.existsById(dto.getIdMecanico()));
+        System.out.println("Existe mecanico ? " + mecanicoRepository.existsById(dto.getIdMecanico()));
 
 
     }

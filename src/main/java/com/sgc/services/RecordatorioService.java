@@ -20,7 +20,7 @@ public class RecordatorioService {
     @Autowired
     private NotificacionService notificacionService;
 
-    // Ejecutar todos los días a las 9:00am
+    // Ejecutar todos los días a las 9:00
     @Scheduled(cron = "0 0 9 * * *", zone = "America/Montevideo")
     @Transactional
     public void enviarRecordatoriosDiarios() {

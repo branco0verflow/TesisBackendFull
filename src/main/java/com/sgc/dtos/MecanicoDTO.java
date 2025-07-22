@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 
 public class MecanicoDTO {
+
+    public interface OnCreate {}
+
     private Integer idMecanico;
 
     @NotEmpty(message = "El nombre es obligatorio")
@@ -26,7 +29,7 @@ public class MecanicoDTO {
 
     private Boolean activoMecanico;
 
-    @NotEmpty(message = "La contraseña es obligatoria")
+    @NotEmpty(message = "La contraseña es obligatoria", groups = OnCreate.class)
     private String passwordMecanico;
 
     @NotNull(message = "Debe incluir al menos una tarea")

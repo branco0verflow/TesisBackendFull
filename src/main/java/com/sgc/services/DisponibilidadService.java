@@ -118,6 +118,7 @@ public class DisponibilidadService {
         return resultados;
     }
 
+    // Necesaria para ver proximas disponibilidad en AVisor de Tareas Admin.
     public List<ProximaDisponibilidadDTO> buscarProximaDisponibilidadPorMecanico(int minutosRequeridos, int limiteDias) {
         List<Mecanico> mecanicos = mecanicoRepo.findAll();
         List<ProximaDisponibilidadDTO> resultados = new ArrayList<>();

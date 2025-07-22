@@ -2,6 +2,8 @@ package com.sgc.services;
 
 import com.sgc.domains.Administrador;
 import com.sgc.repositories.AdministradorRepository;
+import com.sgc.repositories.TareaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,9 @@ public class AdministradorServiceImpl {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TareaRepository tareaRepository;
 
 
     public List<Administrador> getAdministrador() {
@@ -65,10 +70,13 @@ public class AdministradorServiceImpl {
                 });
     }
 
+    @Transactional
     public boolean deleteAdministrador(Integer idAdministrador) {
         if (!administradorRepository.existsById(idAdministrador)) {
             return false;
         }
+
+        tareaRepository.updateTareasOnAdminDelete(idAdministrador);
         administradorRepository.deleteById(idAdministrador);
         return true;
     }

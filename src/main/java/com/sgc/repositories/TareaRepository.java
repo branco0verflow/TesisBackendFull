@@ -2,6 +2,7 @@ package com.sgc.repositories;
 
 import com.sgc.domains.Tarea;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,5 +25,7 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
 
     List<Tarea> findByEstado_IdEstado(Integer idEstado);
 
-
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "UPDATE Tarea t SET t.idadmin = 1 WHERE t.idadmin = :idAdministrador", nativeQuery = true)
+    void updateTareasOnAdminDelete(@Param("idAdministrador") Integer idAdministrador);
 }
