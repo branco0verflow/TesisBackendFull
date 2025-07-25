@@ -9,6 +9,9 @@ import com.sgc.dtos.ModeloDTO;
 import com.sgc.repositories.MarcaRepository;
 import com.sgc.repositories.ModeloRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,16 +26,18 @@ public class ModeloServiceImpl {
     @Autowired
     private MarcaRepository marcaRepository;
 
-    public List<Modelo> getModelos() {
-        return modeloRepository.findAll();
+    public Page<Modelo> getModelos(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return modeloRepository.findAll(pageable);
     }
 
     public Optional<Modelo> getModeloById(int idModelo) {
         return modeloRepository.findById(idModelo);
     }
 
-    public List<Modelo> getModelosByMarcaId(Integer idMarca) {
-        return modeloRepository.findByIdMarca(idMarca);
+    public Page<Modelo> getModelosByMarcaId(Integer idMarca, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return  modeloRepository.findByIdMarca(idMarca, pageable);
     }
 
     public List<Modelo> buscarPorNombreYMarca(String nombreModelo, Integer idmarca) { // Creado por BB no hice push

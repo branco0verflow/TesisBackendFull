@@ -5,6 +5,7 @@ import com.sgc.dtos.ModeloDTO;
 import com.sgc.services.ModeloServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,8 +21,9 @@ public class ModeloController {
     private ModeloServiceImpl modeloService;
 
     @GetMapping
-    public ResponseEntity<?> getModelos() {
-        List<Modelo> listaDeModelos = modeloService.getModelos();
+    public ResponseEntity<?> getModelos(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "20") int size) {
+        Page<Modelo> listaDeModelos = modeloService.getModelos(page, size);
         return ResponseEntity.ok(listaDeModelos);
     }
 
@@ -33,8 +35,8 @@ public class ModeloController {
     }
 
     @GetMapping("/marca/{idMarca}")
-    public ResponseEntity<?> getModelosPorMarca(@PathVariable Integer idMarca) {
-        List<Modelo> modelos = modeloService.getModelosByMarcaId(idMarca);
+    public ResponseEntity<?> getModelosPorMarca(@PathVariable Integer idMarca, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        Page<Modelo> modelos = modeloService.getModelosByMarcaId(idMarca, page, size);
         if (modelos.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

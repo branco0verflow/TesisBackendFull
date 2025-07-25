@@ -326,6 +326,9 @@ public class TareaServiceImpl {
         System.out.println("Exista admin ? " + administradorRepository.existsById(dto.getIdAdmin()));
         System.out.println("Existe estado? " + estadoRepository.existsById(dto.getIdEstado()));
         System.out.println("Existe mecanico ? " + mecanicoRepository.existsById(dto.getIdMecanico()));
+        System.out.println("LocalDate.now(): " + LocalDate.now());
+        System.out.println("Con zona: " + LocalDate.now(ZoneId.of("America/Montevideo")));
+
 
 
     }
