@@ -36,6 +36,7 @@ com\sgc\services\MecanicoServiceImpl.class
 com\sgc\services\TareaServiceImpl.class
 com\sgc\controllers\ModeloController.class
 com\sgc\repositories\ModeloRepository.class
+com\sgc\config\SameSiteCookieConfig.class
 com\sgc\security\SecurityConfig.class
 com\sgc\repositories\ClienteRepository.class
 com\sgc\config\WebConfig$1.class
