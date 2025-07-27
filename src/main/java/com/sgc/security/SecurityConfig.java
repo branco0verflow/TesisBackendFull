@@ -1,6 +1,7 @@
 package com.sgc.security;
 
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -112,3 +113,5 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+
+
