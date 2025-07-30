@@ -42,7 +42,8 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:3000",
                 "https://tesis-taller-front.vercel.app",
-                "https://*.vercel.app"
+                "https://*.vercel.app",
+                "https://www.tallervidesol.com/"
         ));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
