@@ -1,6 +1,10 @@
 package com.sgc.security;
 
+import com.sgc.config.SameSiteCookieConfig;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 
 import java.util.Arrays;
 
@@ -112,6 +117,16 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
+    @Bean
+    public FilterRegistrationBean<SameSiteCookieConfig> sameSiteCookieFilter() {
+        FilterRegistrationBean<SameSiteCookieConfig> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new SameSiteCookieConfig());
+        registrationBean.addUrlPatterns("/*");
+        return registrationBean;
+    }
+
+
 }
 
 

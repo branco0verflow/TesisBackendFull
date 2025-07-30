@@ -3,6 +3,9 @@ package com.sgc.services;
 import com.sgc.domains.Marca;
 import com.sgc.repositories.MarcaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +21,12 @@ public class MarcaServiceImpl {
         return marcaRepository.buscarPorNombre(nombreMarca);
     }
 
-    public List<Marca> getMarcas() {
+    public Page<Marca> getMarcas(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return marcaRepository.findAll(pageable);
+    }
+
+    public List<Marca> getMarcasFiltro() {
         return marcaRepository.findAll();
     }
 

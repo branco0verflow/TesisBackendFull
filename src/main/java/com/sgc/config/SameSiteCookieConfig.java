@@ -15,15 +15,15 @@ public class SameSiteCookieConfig implements Filter {
         chain.doFilter(req, res);
 
         if (res instanceof HttpServletResponse response) {
-            for (Cookie cookie : ((HttpServletRequest) req).getCookies() != null ? ((HttpServletRequest) req).getCookies() : new Cookie[0]) {
-                if ("JSESSIONID".equals(cookie.getName())) {
-                    String value = cookie.getValue();
-                    Cookie sameSiteCookie = new Cookie("JSESSIONID", value);
-                    sameSiteCookie.setMaxAge(cookie.getMaxAge());
-                    sameSiteCookie.setPath("/");
-                    sameSiteCookie.setSecure(true);
-                    sameSiteCookie.setHttpOnly(true);
-                    response.setHeader("Set-Cookie", String.format("JSESSIONID=%s; Path=/; HttpOnly; Secure; SameSite=None", value));
+            HttpServletRequest request = (HttpServletRequest) req;
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("JSESSIONID".equals(cookie.getName())) {
+                        String value = cookie.getValue();
+                        response.setHeader("Set-Cookie",
+                                String.format("JSESSIONID=%s; Path=/; HttpOnly; Secure; SameSite=None", value));
+                    }
                 }
             }
         }

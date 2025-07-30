@@ -4,6 +4,7 @@ import com.sgc.domains.Marca;
 import com.sgc.services.MarcaServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -19,8 +20,15 @@ public class MarcaController {
     private MarcaServiceImpl marcaService;
 
     @GetMapping
-    public ResponseEntity<?> getMarcas(){
-        List<Marca> listaDeMarcas = marcaService.getMarcas();
+    public ResponseEntity<?> getMarcas(@RequestParam(defaultValue = "0") int page,
+                                       @RequestParam(defaultValue = "20") int size){
+        Page<Marca> listaDeMarcas = marcaService.getMarcas(page, size);
+        return ResponseEntity.ok(listaDeMarcas);
+    }
+
+    @GetMapping("/filtros")
+    public ResponseEntity<?> getMarcasFiltro(){
+        List<Marca> listaDeMarcas = marcaService.getMarcasFiltro();
         return ResponseEntity.ok(listaDeMarcas);
     }
 
