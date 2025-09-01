@@ -48,6 +48,7 @@ public class AdministradorController {
         return administradorService.patchAdministrador(idAdministrador, administrador).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
     @DeleteMapping("/{idAdministrador}")
     public ResponseEntity<?> deleteAdministrador(@PathVariable Integer idAdministrador) {
         boolean isDelted = administradorService.deleteAdministrador(idAdministrador);
