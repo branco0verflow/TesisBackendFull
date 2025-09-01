@@ -14,7 +14,7 @@ public class Vehiculo {
     private Integer idVehiculo;
 
     @ManyToOne
-    @JoinColumn(name = "idmodelo", nullable = false)
+    @JoinColumn(name = "idmodelo", nullable = true)
     private Modelo modelo;
 
     @Column(name = "nro_chasis_vehiculo", length = 50, nullable = false)

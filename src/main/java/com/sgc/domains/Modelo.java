@@ -16,7 +16,7 @@ public class Modelo {
     private String nombreModelo;
 
     @ManyToOne
-    @JoinColumn(name = "idmarca", nullable = false)
+    @JoinColumn(name = "idmarca", nullable = true)
     private Marca marca;
 
     public Modelo() {

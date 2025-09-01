@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Integer> {
 
-    @Query("SELECT t FROM Tarea t WHERE t.mecanico.id = :idMecanico AND t.fechaTarea = :fecha ORDER BY t.horaIngresoTarea")
+    @Query("SELECT t FROM tarea t WHERE t.mecanico.id = :idMecanico AND t.fechaTarea = :fecha ORDER BY t.horaIngresoTarea")
     List<Tarea> findByMecanicoAndFecha(@Param("idMecanico") Integer idMecanico, @Param("fecha") LocalDate fecha);
 
     List<Tarea> findByFechaTareaOrderByHoraIngresoTarea(LocalDate fecha);
@@ -26,6 +26,6 @@ public interface TareaRepository extends JpaRepository<Tarea, Integer> {
     List<Tarea> findByEstado_IdEstado(Integer idEstado);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query(value = "UPDATE Tarea t SET t.idadmin = 1 WHERE t.idadmin = :idAdministrador", nativeQuery = true)
+    @Query(value = "UPDATE tarea t SET t.idadmin = 1 WHERE t.idadmin = :idAdministrador", nativeQuery = true)
     void updateTareasOnAdminDelete(@Param("idAdministrador") Integer idAdministrador);
 }
