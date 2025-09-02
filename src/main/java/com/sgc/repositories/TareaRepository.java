@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Integer> {
 
-    @Query("SELECT t FROM tarea t WHERE t.mecanico.id = :idMecanico AND t.fecha_tarea = :fecha ORDER BY t.horaIngresoTarea")
+    @Query("SELECT t FROM Tarea t WHERE t.mecanico.id = :idMecanico AND t.fechaTarea = :fecha ORDER BY t.horaIngresoTarea")
     List<Tarea> findByMecanicoAndFecha(@Param("idMecanico") Integer idMecanico, @Param("fecha") LocalDate fecha);
 
     List<Tarea> findByFechaTareaOrderByHoraIngresoTarea(LocalDate fecha);
